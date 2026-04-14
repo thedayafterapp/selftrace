@@ -76,7 +76,7 @@ This file is **not** loaded automatically — production only runs `docker-compo
 | Service    | URL / port                        |
 |------------|-----------------------------------|
 | App        | http://localhost:6622             |
-| MySQL      | localhost:3306 (user: selftrace, pass: selftrace) |
+| MySQL      | localhost:3444 (user: selftrace, pass: selftrace) |
 | phpMyAdmin | http://localhost:8081 (dev only — see above) |
 
 ## Tech stack
