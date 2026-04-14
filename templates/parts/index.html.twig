@@ -56,25 +56,40 @@
         {% endif %}
 
         {% if parts|length >= 3 %}
-            <div class="rounded-2xl p-6" style="background: linear-gradient(135deg, rgba(232,165,160,0.08), rgba(232,165,160,0.04)); border: 1px solid rgba(232,165,160,0.2);">
-                <div class="flex items-center gap-2 mb-3">
-                    <span class="inline-block w-2 h-2 rounded-full animate-pulse" style="background: #e8a5a0;"></span>
-                    <span class="text-xs uppercase tracking-wider" style="color: rgba(232,165,160,0.7);">Parts Synthesis</span>
+            <div id="parts-synthesis-block" class="rounded-2xl p-6" style="background: linear-gradient(135deg, rgba(232,165,160,0.08), rgba(232,165,160,0.04)); border: 1px solid rgba(232,165,160,0.2);">
+                <div class="flex items-center justify-between gap-2 mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block w-2 h-2 rounded-full animate-pulse" style="background: #e8a5a0;"></span>
+                        <span class="text-xs uppercase tracking-wider" style="color: rgba(232,165,160,0.7);">Parts Synthesis</span>
+                    </div>
+                    {% if latest_synthesis %}
+                        <button onclick="togglePartsSynthesis()" id="parts-synthesis-toggle"
+                                class="text-xs px-3 py-1 rounded-full transition-all"
+                                style="color: rgba(232,165,160,0.7); border: 1px solid rgba(232,165,160,0.2);">
+                            Minimize
+                        </button>
+                    {% endif %}
                 </div>
 
-                {# Saved synthesis — always visible #}
+                {# Saved synthesis — collapsible #}
                 {% if latest_synthesis %}
-                    <p class="font-serif text-base mb-4" style="color: rgba(232,165,160,0.7);">
-                        What your parts share
-                        <span class="text-stone-600 font-sans text-xs font-normal ml-2">{{ latest_synthesis.generatedAt|date("M j, Y") }}</span>
-                    </p>
-                    <div id="saved-synthesis-text" class="font-serif text-lg text-stone-200 leading-relaxed markdown-rendered mb-5" data-raw="{{ latest_synthesis.content|e('html_attr') }}"></div>
-                    <p class="text-stone-500 text-sm mb-4">Regenerate anytime — each new part makes the analysis richer.</p>
-                    <button onclick="startPartsSynthesis()"
-                            id="parts-btn"
-                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-medium text-sm btn-ghost-rose">
-                        Regenerate
-                    </button>
+                    <div id="saved-synthesis-wrapper" class="mb-5">
+                        <p class="font-serif text-base mb-4" style="color: rgba(232,165,160,0.7);">
+                            What your parts share
+                            <span class="text-stone-600 font-sans text-xs font-normal ml-2">{{ latest_synthesis.generatedAt|date("M j, Y") }}</span>
+                        </p>
+                        <div id="saved-synthesis-body">
+                            <div id="saved-synthesis-text" class="font-serif text-lg text-stone-200 leading-relaxed markdown-rendered" data-raw="{{ latest_synthesis.content|e('html_attr') }}"></div>
+                        </div>
+                    </div>
+                    <div id="parts-regen">
+                        <p class="text-stone-500 text-sm mb-4">Regenerate anytime — each new part makes the analysis richer.</p>
+                        <button onclick="startPartsSynthesis()"
+                                id="parts-btn"
+                                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-medium text-sm btn-ghost-rose">
+                            Regenerate
+                        </button>
+                    </div>
                 {% else %}
                     <h2 class="font-serif text-2xl mb-2" style="color: #f0c8c4;">What are my parts trying to tell me?</h2>
                     <p class="text-stone-400 text-sm mb-5 max-w-lg">
@@ -157,6 +172,41 @@ function renderMarkdown() {
     });
 }
 renderMarkdown();
+
+function setPartsSynthesisMinimized(minimized) {
+    var body = document.getElementById('saved-synthesis-body');
+    var regen = document.getElementById('parts-regen');
+    var btn = document.getElementById('parts-synthesis-toggle');
+    var wrapper = document.getElementById('saved-synthesis-wrapper');
+    var block = document.getElementById('parts-synthesis-block');
+    if (!body) return;
+    if (minimized) {
+        body.classList.add('hidden');
+        if (regen) regen.classList.add('hidden');
+        if (wrapper) { wrapper.classList.remove('mb-5'); wrapper.classList.add('mb-0'); }
+        if (block) { block.classList.remove('p-6'); block.classList.add('pt-6', 'px-6', 'pb-3'); }
+        if (btn) btn.textContent = 'Show';
+    } else {
+        body.classList.remove('hidden');
+        if (regen) regen.classList.remove('hidden');
+        if (wrapper) { wrapper.classList.remove('mb-0'); wrapper.classList.add('mb-5'); }
+        if (block) { block.classList.remove('pt-6', 'px-6', 'pb-3'); block.classList.add('p-6'); }
+        if (btn) btn.textContent = 'Minimize';
+    }
+    localStorage.setItem('parts-synthesis-minimized', minimized ? '1' : '0');
+}
+
+function togglePartsSynthesis() {
+    var body = document.getElementById('saved-synthesis-body');
+    if (!body) return;
+    setPartsSynthesisMinimized(!body.classList.contains('hidden'));
+}
+
+(function() {
+    if (localStorage.getItem('parts-synthesis-minimized') === '1') {
+        setPartsSynthesisMinimized(true);
+    }
+})();
 
 async function startPartsSynthesis() {
     const btn = document.getElementById('parts-btn');
