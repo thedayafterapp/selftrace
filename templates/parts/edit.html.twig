@@ -1,0 +1,17 @@
+{% extends 'layout.html.twig' %}
+{% block title %}Edit Part — Selftrace{% endblock %}
+{% block content %}
+<div class="max-w-2xl space-y-6">
+    <div>
+        <a href="{{ path('parts_index') }}" class="text-sm text-stone-500 hover:text-stone-300 transition-colors flex items-center gap-1 mb-6">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
+            </svg>
+            Back to parts
+        </a>
+        <h1 class="font-serif text-3xl mb-1" style="color: #f0ede8;">Edit part</h1>
+        <p class="font-serif text-lg" style="color: #e8a5a0;">{{ part.name }}</p>
+    </div>
+    {{ include('parts/_form.html.twig') }}
+</div>
+{% endblock %}

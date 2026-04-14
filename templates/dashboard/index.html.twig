@@ -1,0 +1,103 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Dashboard — Selftrace{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    {# Header #}
+    <div>
+        <h1 class="font-serif text-3xl mb-1" style="color: #f0ede8;">Good to see you.</h1>
+        <p class="text-stone-500">{{ "now"|date("l, F j") }}</p>
+    </div>
+
+    {# Stats row #}
+    <div class="grid grid-cols-3 gap-4">
+        {% set stats = [
+            { label: 'Chapters', count: chapter_count, href: path('timeline_index'), color: '#f59e0b' },
+            { label: 'Parts', count: part_count, href: path('parts_index'), color: '#e8a5a0' },
+            { label: 'Reflections', count: reflection_count, href: path('reflections_history'), color: '#d4af37' },
+        ] %}
+        {% for stat in stats %}
+            <a href="{{ stat.href }}"
+               class="rounded-xl p-5 flex flex-col gap-1 transition-all duration-200 hover:scale-[1.02]"
+               style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
+                <span class="font-serif text-3xl font-semibold" style="color: {{ stat.color }};">{{ stat.count }}</span>
+                <span class="text-stone-500 text-sm">{{ stat.label }}</span>
+            </a>
+        {% endfor %}
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6">
+        {# Today's prompt #}
+        <div class="rounded-2xl p-6" style="background: #131628; border: 1px solid rgba(212,175,55,0.15);">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                <span class="text-xs text-amber-400/70 uppercase tracking-wider">Today's reflection</span>
+            </div>
+
+            {% if today_prompt %}
+                <p class="font-serif text-lg leading-relaxed mb-5" style="color: #f0ede8;">
+                    {{ today_prompt.promptText }}
+                </p>
+
+                {% if today_reflection %}
+                    <div class="rounded-lg px-4 py-3 mb-4" style="background: rgba(255,255,255,0.04);">
+                        <p class="text-stone-400 text-sm leading-relaxed line-clamp-3">{{ today_reflection.responseText }}</p>
+                    </div>
+                    <a href="{{ path('reflections_index') }}" class="text-sm text-amber-400 hover:text-amber-300 transition-colors">
+                        Edit today's reflection →
+                    </a>
+                {% else %}
+                    <a href="{{ path('reflections_index') }}"
+                       class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium btn-ghost-amber">
+                        Write your reflection
+                    </a>
+                {% endif %}
+            {% else %}
+                <p class="text-stone-500 text-sm">Prompts loading soon...</p>
+            {% endif %}
+        </div>
+
+        {# Add a chapter CTA #}
+        <div class="rounded-2xl p-6" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);">
+            <h3 class="font-serif text-lg text-stone-300 mb-3">{{ chapter_count == 0 ? 'Where to begin' : 'Add a chapter' }}</h3>
+            <p class="text-stone-500 text-sm leading-relaxed mb-5">
+                Each chapter is a period of your life where you felt like a specific version of yourself — a different name, a different set of fears, a different way of moving through the world.
+            </p>
+            <a href="{{ path('timeline_index') }}"
+               class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium btn-ghost-amber">
+                {{ chapter_count == 0 ? 'Add your first chapter' : 'Add a chapter' }} →
+            </a>
+        </div>
+    </div>
+
+    {# Revisit onboarding #}
+    <div class="pt-2">
+        <a href="{{ path('onboarding_restart') }}"
+           class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium btn-ghost-violet">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/>
+            </svg>
+            Revisit the introduction
+        </a>
+    </div>
+
+    {# Recent reflections #}
+    {% if recent_reflections is not empty %}
+        <div>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-serif text-xl text-stone-300">Recent reflections</h2>
+                <a href="{{ path('reflections_history') }}" class="text-sm text-stone-500 hover:text-stone-300 transition-colors">View all →</a>
+            </div>
+            <div class="space-y-3">
+                {% for reflection in recent_reflections %}
+                    <div class="rounded-xl p-4" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+                        <p class="text-stone-500 text-xs mb-2">{{ reflection.date|date("M j, Y") }}</p>
+                        <p class="text-stone-400 text-sm leading-relaxed line-clamp-2">{{ reflection.responseText }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

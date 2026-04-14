@@ -1,0 +1,60 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Daily Reflection — Selftrace{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl space-y-8">
+    {# Header #}
+    <div>
+        <h1 class="font-serif text-3xl mb-1" style="color: #f0ede8;">Daily Reflection</h1>
+        <p class="text-stone-500">{{ "now"|date("l, F j") }}</p>
+    </div>
+
+    {% if prompt %}
+        <div class="rounded-2xl overflow-hidden" style="background: #131628; border: 1px solid rgba(212,175,55,0.2);">
+            {# Prompt display #}
+            <div class="px-8 pt-8 pb-6" style="background: linear-gradient(135deg, rgba(212,175,55,0.06), transparent);">
+                <p class="text-xs text-stone-500 uppercase tracking-wider mb-4">Today's question</p>
+                <p class="font-serif text-2xl leading-relaxed" style="color: #f0ede8;">{{ prompt.promptText }}</p>
+            </div>
+
+            {# Response area #}
+            <div class="px-8 pt-6 pb-8">
+                <form method="post" action="{{ path('reflections_save') }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('save-reflection') }}">
+
+                    <textarea name="response_text"
+                              rows="8"
+                              class="form-input w-full px-4 py-4 rounded-xl text-stone-200 text-base leading-relaxed resize-none transition-all"
+                              style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);"
+                              placeholder="Take your time. Write whatever comes...">{{ today_reflection ? today_reflection.responseText : '' }}</textarea>
+
+                    <div class="flex items-center justify-between mt-4">
+                        <button type="submit"
+                                class="px-6 py-3 rounded-full font-medium text-sm btn-gold">
+                            {{ today_reflection ? 'Update reflection' : 'Save reflection' }}
+                        </button>
+
+                        {% if today_reflection %}
+                            <p class="text-stone-600 text-xs">
+                                Last saved {{ today_reflection.createdAt|date("g:i a") }}
+                            </p>
+                        {% endif %}
+                    </div>
+                </form>
+
+                {# View history link #}
+                <div class="mt-6 pt-6 border-t border-white/5">
+                    <a href="{{ path('reflections_history') }}" class="text-sm text-stone-500 hover:text-stone-300 transition-colors">
+                        View all past reflections →
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="flex flex-col items-center justify-center py-24 text-center">
+            <p class="text-stone-500">Prompts are loading. Please check back soon.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

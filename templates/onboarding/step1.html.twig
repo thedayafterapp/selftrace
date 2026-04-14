@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Welcome — Selftrace{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex items-center justify-center px-4 py-12" style="background: #0d0f1a;">
+    <div class="w-full max-w-2xl">
+        {# Progress indicator #}
+        <div class="flex items-center justify-center gap-2 mb-12">
+            <div class="w-8 h-1.5 rounded-full bg-amber-500"></div>
+            <div class="w-8 h-1.5 rounded-full" style="background: rgba(255,255,255,0.15);"></div>
+            <div class="w-8 h-1.5 rounded-full" style="background: rgba(255,255,255,0.15);"></div>
+        </div>
+
+        <div class="text-center mb-10">
+            <p class="text-amber-400/70 text-sm tracking-widest uppercase mb-4">Step 1 of 3</p>
+            <h1 class="font-serif text-4xl md:text-5xl mb-6" style="color: #f0ede8;">
+                Before we start —<br>
+                <em class="text-amber-400 not-italic">a few words about why you're here.</em>
+            </h1>
+        </div>
+
+        <div class="rounded-2xl p-8 md:p-10 mb-8" style="background: #131628; border: 1px solid rgba(255,255,255,0.06);">
+            <div class="space-y-6 text-stone-300 text-lg leading-relaxed">
+                <p>
+                    You've probably spent a long time feeling like there's no stable "you." Like you change depending on who you're with, what's happening, what year it is. Like each version of you is real in the moment — and completely disconnected from the others.
+                </p>
+                <p>
+                    This experience has a name: <strong class="text-rose-300">identity diffusion</strong>. It's one of the most common and painful experiences in BPD. It's not a character flaw. It's not you being dramatic or inconsistent. It's a specific kind of psychological pain — and it makes sense why you have it.
+                </p>
+                <p>
+                    Here's what we want you to hold onto:
+                </p>
+                <blockquote class="border-l-4 pl-6 py-2" style="border-color: #f59e0b;">
+                    <p class="font-serif text-xl text-amber-200 italic leading-relaxed">
+                        "The fact that you feel like many different people doesn't mean there's no you. It means you haven't been shown where to look."
+                    </p>
+                </blockquote>
+                <p>
+                    There is a continuous self underneath all of it. Values you've always had, even in different forms. Patterns that repeat across every chapter. A way of being that was always yours, even when you couldn't feel it.
+                </p>
+                <p class="text-stone-400">
+                    Selftrace's entire purpose is to help you see it.
+                </p>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <a href="{{ path('onboarding_step2') }}"
+               class="inline-flex items-center gap-3 px-8 py-4 rounded-full font-medium group btn-amber">
+                That resonates — tell me more
+                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

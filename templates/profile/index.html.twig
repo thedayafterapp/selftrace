@@ -1,0 +1,51 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Profile — Selftrace{% endblock %}
+
+{% block content %}
+<div class="max-w-lg space-y-8">
+    <div>
+        <h1 class="font-serif text-3xl mb-1" style="color: #f0ede8;">Profile</h1>
+        <p class="text-stone-500">Update your username and password</p>
+    </div>
+
+    <div class="rounded-2xl p-6 md:p-8" style="background: #131628; border: 1px solid rgba(255,255,255,0.06);">
+        {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+
+        <div class="mb-5">
+            <label class="block text-sm font-medium text-stone-400 mb-2">Username</label>
+            {{ form_widget(form.username, {
+                attr: {
+                    class: 'form-input w-full px-4 py-3 rounded-xl text-stone-100 text-sm',
+                    style: 'background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);'
+                }
+            }) }}
+            {{ form_errors(form.username) }}
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-stone-400 mb-2">New password</label>
+            {{ form_widget(form.newPassword, {
+                attr: {
+                    class: 'form-input w-full px-4 py-3 rounded-xl text-stone-100 text-sm',
+                    style: 'background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);',
+                    placeholder: 'Leave blank to keep current password'
+                }
+            }) }}
+            {{ form_errors(form.newPassword) }}
+        </div>
+
+        <button type="submit"
+                class="px-6 py-3 rounded-full font-medium text-sm btn-amber">
+            Save changes
+        </button>
+
+        {{ form_end(form) }}
+    </div>
+
+    <div class="rounded-2xl p-6" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.04);">
+        <p class="text-stone-500 text-sm mb-1">Member since</p>
+        <p class="text-stone-400 text-sm">{{ app.user.createdAt|date("F j, Y") }}</p>
+    </div>
+</div>
+{% endblock %}

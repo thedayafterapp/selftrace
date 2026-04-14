@@ -1,0 +1,145 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Patterns — Selftrace{% endblock %}
+
+{% block content %}
+<div class="space-y-10">
+    {# Header #}
+    <div>
+        <h1 class="font-serif text-3xl mb-1" style="color: #f0ede8;">Patterns</h1>
+        <p class="text-stone-500">What keeps showing up across everything you've written</p>
+    </div>
+
+    {% if not has_content %}
+        <div class="flex flex-col items-center justify-center py-24 text-center">
+            <div class="w-16 h-16 mb-6 opacity-30 text-violet-400">
+                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <polyline points="8,50 20,30 30,38 42,18 54,24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    <circle cx="8" cy="50" r="3" fill="currentColor"/>
+                    <circle cx="20" cy="30" r="3" fill="currentColor"/>
+                    <circle cx="30" cy="38" r="3" fill="currentColor"/>
+                    <circle cx="42" cy="18" r="3" fill="currentColor"/>
+                    <circle cx="54" cy="24" r="3" fill="currentColor"/>
+                </svg>
+            </div>
+            <h2 class="font-serif text-2xl text-stone-400 mb-3">Patterns emerge over time</h2>
+            <p class="text-stone-600 max-w-sm leading-relaxed mb-8">
+                Add chapters, name your parts, and write reflections. The more you share, the more the patterns reveal themselves.
+            </p>
+            <div class="flex gap-4">
+                <a href="{{ path('timeline_new') }}" class="text-sm px-5 py-2.5 rounded-full transition-all" style="background: rgba(245,158,11,0.15); color: #f59e0b; border: 1px solid rgba(245,158,11,0.25);">
+                    Add a chapter
+                </a>
+                <a href="{{ path('reflections_index') }}" class="text-sm px-5 py-2.5 rounded-full transition-all" style="background: rgba(212,175,55,0.15); color: #d4af37; border: 1px solid rgba(212,175,55,0.25);">
+                    Write a reflection
+                </a>
+            </div>
+        </div>
+
+    {% else %}
+
+        {# Your story so far #}
+        {% if story_sentences is not empty %}
+            <div class="rounded-2xl p-6 md:p-8" style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);">
+                <p class="text-xs text-stone-600 uppercase tracking-wider mb-4">Your story so far</p>
+                <p class="font-serif text-xl text-stone-300 leading-relaxed">
+                    {{ story_sentences|join(' → ') }}
+                </p>
+            </div>
+        {% endif %}
+
+        {# Top words #}
+        {% if top_words is not empty %}
+            <div>
+                <h2 class="font-serif text-2xl text-stone-300 mb-5">You keep returning to...</h2>
+                <div class="flex flex-wrap gap-2">
+                    {% set max_count = top_words|first %}
+                    {% for word, count in top_words %}
+                        {% set size = 0.75 + (count / max_count) * 0.75 %}
+                        <span class="px-3 py-1.5 rounded-full font-medium transition-all duration-200 hover:scale-105"
+                              style="
+                                  background: rgba(245,158,11,{{ 0.05 + (count / max_count) * 0.15 }});
+                                  color: rgba(245,158,11,{{ 0.5 + (count / max_count) * 0.5 }});
+                                  border: 1px solid rgba(245,158,11,{{ 0.1 + (count / max_count) * 0.15 }});
+                                  font-size: {{ size }}rem;
+                              ">
+                            {{ word }}
+                            <span class="text-xs opacity-50 ml-1">{{ count }}</span>
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {# Writing heatmap #}
+        {% if heatmap_days is not empty %}
+            <div>
+                <h2 class="font-serif text-2xl text-stone-300 mb-2">Writing consistency</h2>
+                <p class="text-stone-600 text-sm mb-5">Last 12 weeks</p>
+                <div class="flex gap-1 flex-wrap pb-2">
+                    {% for day in heatmap_days %}
+                        <div class="heatmap-day w-4 h-4 rounded-sm flex-shrink-0"
+                             style="background: {{ day.is_future ? 'rgba(255,255,255,0.03)' : (day.has_entry ? 'rgba(245,158,11,0.7)' : 'rgba(255,255,255,0.05)') }};"
+                             data-tooltip="{{ day.date|date('M j, Y') }}{{ day.has_entry ? ' · wrote' : '' }}">
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="flex items-center gap-2 mt-2">
+                    <div class="w-3 h-3 rounded-sm" style="background: rgba(255,255,255,0.05);"></div>
+                    <span class="text-xs text-stone-600">no entry</span>
+                    <div class="w-3 h-3 rounded-sm ml-3" style="background: rgba(245,158,11,0.7);"></div>
+                    <span class="text-xs text-stone-600">wrote that day</span>
+                </div>
+            </div>
+        {% endif %}
+
+        {# AI Insights #}
+        {% if insights is not empty %}
+            <div>
+                <h2 class="font-serif text-2xl text-stone-300 mb-5">What the AI has seen in you</h2>
+                <div class="space-y-4">
+                    {% for insight in insights %}
+                        <div class="rounded-2xl overflow-hidden" style="background: #131628; border: 1px solid rgba(255,255,255,0.06);">
+                            <div class="px-6 py-3 flex items-center gap-3" style="background: rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.04);">
+                                {% if insight.type == 'throughline' %}
+                                    <span class="text-xs px-2 py-0.5 rounded-full" style="background: rgba(245,158,11,0.15); color: #f59e0b;">Throughline</span>
+                                {% elseif insight.type == 'reflection_synthesis' %}
+                                    <span class="text-xs px-2 py-0.5 rounded-full" style="background: rgba(212,175,55,0.15); color: #d4af37;">Reflection Synthesis</span>
+                                {% else %}
+                                    <span class="text-xs px-2 py-0.5 rounded-full" style="background: rgba(232,165,160,0.15); color: #e8a5a0;">Parts Synthesis</span>
+                                {% endif %}
+                                <span class="text-stone-600 text-xs ml-auto">{{ insight.generatedAt|date("M j, Y") }}</span>
+                                <form method="post" action="{{ path('ai_insight_delete', {id: insight.id}) }}"
+                                      onsubmit="return confirm('Delete this insight?')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete-insight-' ~ insight.id) }}">
+                                    <button type="submit" class="p-1.5 rounded-lg text-stone-700 hover:text-red-400 hover:bg-red-400/5 transition-all" title="Delete">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="px-6 py-5">
+                                <div class="font-serif text-stone-300 leading-relaxed markdown-rendered" data-raw="{{ insight.content|e('html_attr') }}"></div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+(function() {
+    if (typeof marked === 'undefined') return;
+    document.querySelectorAll('.markdown-rendered[data-raw]').forEach(function(el) {
+        el.innerHTML = marked.parse(el.dataset.raw, { breaks: true });
+    });
+})();
+</script>
+{% endblock %}

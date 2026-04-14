@@ -1,0 +1,144 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Reflection History — Selftrace{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    {# Header #}
+    <div class="flex items-end justify-between">
+        <div>
+            <h1 class="font-serif text-3xl mb-1" style="color: #f0ede8;">Reflection History</h1>
+            <p class="text-stone-500">Everything you've written, in one place</p>
+        </div>
+        <a href="{{ path('reflections_index') }}"
+           class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200"
+           style="background: rgba(212,175,55,0.15); color: #d4af37; border: 1px solid rgba(212,175,55,0.25);">
+            Today's reflection →
+        </a>
+    </div>
+
+    {% if reflections is empty %}
+        <div class="flex flex-col items-center justify-center py-24 text-center">
+            <div class="w-16 h-16 mb-6 opacity-30" style="color: #d4af37;">
+                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="12" y="8" width="40" height="48" rx="4" stroke="currentColor" stroke-width="2"/>
+                    <line x1="20" y1="22" x2="44" y2="22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="20" y1="30" x2="40" y2="30" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="20" y1="38" x2="36" y2="38" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h2 class="font-serif text-2xl text-stone-400 mb-3">No reflections yet</h2>
+            <p class="text-stone-600 max-w-sm leading-relaxed mb-8">
+                Write your first reflection today. One question. No pressure. Whatever comes up is enough.
+            </p>
+            <a href="{{ path('reflections_index') }}"
+               class="inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium text-sm transition-all duration-200"
+               style="background: linear-gradient(135deg, #d4af37, #b8960c); color: #0d0f1a;">
+                Write today's reflection
+            </a>
+        </div>
+
+    {% else %}
+
+        {# AI synthesis CTA (5+ reflections) #}
+        {% if reflections|length >= 5 %}
+            <div class="rounded-2xl p-6" style="background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(212,175,55,0.04)); border: 1px solid rgba(212,175,55,0.2);">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="inline-block w-2 h-2 rounded-full animate-pulse" style="background: #d4af37;"></span>
+                    <span class="text-xs uppercase tracking-wider" style="color: rgba(212,175,55,0.7);">Reflection Synthesis</span>
+                </div>
+                <h2 class="font-serif text-2xl mb-2" style="color: #f0e0a0;">What do my reflections say about me?</h2>
+                <p class="text-stone-400 text-sm mb-5 max-w-lg">
+                    You've written {{ reflections|length }} reflections. The AI can read across all of them and reflect back the themes, values, and patterns it sees in your own words.
+                </p>
+                <button onclick="startReflectionSynthesis()"
+                        id="reflection-btn"
+                        class="inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium text-sm transition-all duration-200"
+                        style="background: linear-gradient(135deg, #d4af37, #b8960c); color: #0d0f1a;">
+                    See what emerges
+                </button>
+
+                <div id="reflection-output" class="hidden mt-6">
+                    <div class="border-t pt-6" style="border-color: rgba(212,175,55,0.2);">
+                        <div id="reflection-text" class="font-serif text-lg text-stone-200 leading-relaxed whitespace-pre-wrap"></div>
+                        <div id="reflection-cursor" class="inline-block w-0.5 h-5 animate-pulse ml-0.5 hidden" style="background: #d4af37;"></div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {# Journal entries #}
+        <div class="space-y-4">
+            {% for reflection in reflections %}
+                <div class="rounded-2xl overflow-hidden" style="background: #131628; border: 1px solid rgba(255,255,255,0.06);">
+                    <div class="px-6 py-4 flex items-center justify-between" style="background: rgba(212,175,55,0.04); border-bottom: 1px solid rgba(255,255,255,0.04);">
+                        <p class="text-sm font-medium" style="color: #d4af37;">{{ reflection.date|date("l, F j, Y") }}</p>
+                    </div>
+                    <div class="px-6 py-5">
+                        <p class="text-stone-500 text-sm mb-3 italic">{{ reflection.promptText }}</p>
+                        <p class="text-stone-300 leading-relaxed whitespace-pre-wrap">{{ reflection.responseText }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+async function startReflectionSynthesis() {
+    const btn = document.getElementById('reflection-btn');
+    const output = document.getElementById('reflection-output');
+    const text = document.getElementById('reflection-text');
+    const cursor = document.getElementById('reflection-cursor');
+
+    btn.disabled = true;
+    btn.textContent = 'Reading your reflections...';
+    output.classList.remove('hidden');
+    text.textContent = '';
+    cursor.classList.remove('hidden');
+
+    let fullText = '';
+
+    try {
+        const response = await fetch('{{ path("ai_reflection_synthesis") }}', {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            fullText += chunk;
+            text.textContent = fullText;
+        }
+
+        cursor.classList.add('hidden');
+
+        if (typeof marked !== 'undefined' && fullText.trim()) {
+            text.innerHTML = marked.parse(fullText);
+        }
+
+        if (fullText.trim()) {
+            await fetch('{{ path("ai_save_insight") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'reflection_synthesis', content: fullText }),
+            });
+        }
+    } catch (e) {
+        text.textContent = 'Something went wrong. Please try again.';
+        cursor.classList.add('hidden');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Regenerate';
+}
+</script>
+{% endblock %}

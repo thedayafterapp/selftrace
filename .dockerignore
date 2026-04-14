@@ -1,0 +1,10 @@
+.env
+.env.local
+var/
+vendor/
+.git/
+.gitignore
+README.md
+SETUP.md
+*.md
+instructions.txt

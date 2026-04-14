@@ -1,0 +1,330 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}My Timeline — Selftrace{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    {# Header #}
+    <div class="flex items-end justify-between">
+        <div>
+            <h1 class="font-serif text-3xl mb-1" style="color: #f0ede8;">Who I've Been</h1>
+            <p class="text-stone-500">The chapters of your life, mapped over time</p>
+        </div>
+        <a href="{{ path('timeline_new') }}"
+           class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium btn-ghost-amber">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add chapter
+        </a>
+    </div>
+
+    {% if chapters is empty %}
+        {# Empty state #}
+        <div class="flex flex-col items-center justify-center py-24 text-center">
+            <div class="w-16 h-16 mb-6 opacity-30">
+                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="20" y1="8" x2="20" y2="56" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="20" cy="18" r="5" fill="#f59e0b"/>
+                    <circle cx="20" cy="32" r="5" fill="#f59e0b"/>
+                    <circle cx="20" cy="46" r="5" fill="#f59e0b"/>
+                    <line x1="20" y1="18" x2="50" y2="18" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="20" y1="32" x2="46" y2="32" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+                    <line x1="20" y1="46" x2="48" y2="46" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h2 class="font-serif text-2xl text-stone-400 mb-3">Your timeline is empty</h2>
+            <p class="text-stone-600 max-w-sm leading-relaxed mb-8">
+                Every version of you deserves a place here. Start with any chapter — it doesn't have to be in order, and it doesn't have to be perfect.
+            </p>
+            <a href="{{ path('timeline_new') }}"
+               class="inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium text-sm btn-amber">
+                Add your first chapter
+            </a>
+        </div>
+
+    {% else %}
+
+        {# Throughline section — always visible when chapters exist #}
+        <div id="throughline-block" class="rounded-2xl p-6 mb-2" style="background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(212,175,55,0.04)); border: 1px solid rgba(245,158,11,0.2); box-shadow: 0 0 40px rgba(245,158,11,0.06);">
+            <div class="flex items-center gap-2 mb-4">
+                <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                <span class="text-amber-400/80 text-xs uppercase tracking-wider">Throughline Discovery</span>
+            </div>
+
+            {# Saved throughline — open by default, collapsible #}
+            {% if latest_throughline %}
+                <div id="saved-throughline-wrapper" class="mb-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <p class="font-serif text-base text-stone-400">
+                            Your throughline
+                            <span class="text-stone-600 font-sans text-xs font-normal ml-2">{{ latest_throughline.generatedAt|date("M j, Y") }}</span>
+                        </p>
+                        <button onclick="toggleSavedThroughline()" id="throughline-toggle"
+                                class="text-sm text-stone-500 hover:text-stone-300 transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5">
+                            Minimize
+                        </button>
+                    </div>
+                    <div id="saved-throughline-body">
+                        <div id="saved-throughline-text" class="font-serif text-lg text-stone-200 leading-relaxed markdown-rendered" data-raw="{{ latest_throughline.content|e('html_attr') }}"></div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {# CTA: generate / progress bar #}
+            {% if chapters|length >= 3 %}
+                {% if latest_throughline %}
+                    <div id="throughline-regen">
+                        <p class="text-stone-500 text-sm mb-4">Regenerate anytime — each new chapter makes the analysis richer.</p>
+                        <button id="discover-btn"
+                                onclick="startThroughlineDiscovery()"
+                                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-medium text-sm btn-ghost-amber">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                            </svg>
+                            Regenerate
+                        </button>
+                    </div>
+                {% else %}
+                    <h2 class="font-serif text-xl text-amber-200 mb-2">Ready to find what's always been you?</h2>
+                    <p class="text-stone-400 text-sm mb-4 max-w-lg">
+                        You've mapped {{ chapters|length }} chapters. The AI can read across all of them and find the continuous thread — the values, patterns, and qualities that were always yours.
+                    </p>
+                    <button id="discover-btn"
+                            onclick="startThroughlineDiscovery()"
+                            class="inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium text-sm btn-amber">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                        </svg>
+                        Find my throughline
+                    </button>
+                {% endif %}
+            {% else %}
+                <p class="text-stone-400 text-sm mb-3">
+                    Add <span class="text-amber-400 font-medium">{{ 3 - chapters|length }} more chapter{{ (3 - chapters|length) != 1 ? 's' : '' }}</span> to unlock throughline discovery.
+                </p>
+                <div class="h-1.5 rounded-full overflow-hidden max-w-xs" style="background: rgba(255,255,255,0.06);">
+                    <div class="h-full rounded-full transition-all duration-500" style="width: {{ (chapters|length / 3 * 100)|round }}%; background: rgba(245,158,11,0.5);"></div>
+                </div>
+            {% endif %}
+
+            {# Streaming output area #}
+            <div id="throughline-output" class="hidden mt-6">
+                <div class="pt-6" style="border-top: 1px solid rgba(245,158,11,0.2);">
+                    <div id="throughline-text" class="font-serif text-lg text-stone-200 leading-relaxed whitespace-pre-wrap"></div>
+                    <div id="throughline-cursor" class="inline-block w-0.5 h-5 bg-amber-400 animate-pulse ml-0.5 hidden"></div>
+                </div>
+            </div>
+        </div>
+
+        {# Timeline #}
+        <div class="relative">
+            {# Vertical line #}
+            <div class="absolute left-4 top-0 bottom-0 w-px" style="background: linear-gradient(to bottom, rgba(245,158,11,0.3), rgba(245,158,11,0.05));"></div>
+
+            <div class="space-y-6 pl-12">
+                {% for chapter in chapters %}
+                    <div class="chapter-card relative group" data-id="{{ chapter.id }}">
+                        {# Timeline dot #}
+                        <div class="absolute -left-12 top-5 w-4 h-4 rounded-full flex items-center justify-center z-10"
+                             style="background: {{ chapter.colorHex }}; box-shadow: 0 0 12px {{ chapter.colorHex }}50;">
+                            <div class="w-1.5 h-1.5 rounded-full bg-white opacity-70"></div>
+                        </div>
+
+                        {# Chapter card #}
+                        <div class="rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl chapter-card-inner"
+                             style="background: #131628; border: 1px solid rgba(255,255,255,0.06); border-left: 3px solid {{ chapter.colorHex }};">
+
+                            {# Card header — always visible #}
+                            <div class="p-5 flex items-start justify-between gap-4" onclick="toggleChapter({{ chapter.id }})">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-3 mb-1.5">
+                                        <h3 class="font-serif text-xl" style="color: {{ chapter.colorHex }};">{{ chapter.title }}</h3>
+                                        {% if chapter.isOngoing %}
+                                            <span class="text-xs px-2 py-0.5 rounded-full" style="background: rgba(245,158,11,0.15); color: #f59e0b;">ongoing</span>
+                                        {% endif %}
+                                    </div>
+                                    <p class="text-stone-500 text-sm">
+                                        {{ chapter.startDate|date("M j, Y") }} — {{ chapter.isOngoing ? 'present' : (chapter.endDate ? chapter.endDate|date("M j, Y") : '?') }}
+                                        {% if chapter.partName %}
+                                            <span class="mx-2 opacity-40">·</span>
+                                            <em class="text-stone-400">{{ chapter.partName }}</em>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="flex items-center gap-2 flex-shrink-0">
+                                    <a href="{{ path('timeline_edit', {id: chapter.id}) }}"
+                                       class="p-2 rounded-lg text-stone-600 hover:text-stone-300 hover:bg-white/5 transition-all"
+                                       onclick="event.stopPropagation()">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/>
+                                        </svg>
+                                    </a>
+                                    <form method="post" action="{{ path('timeline_delete', {id: chapter.id}) }}"
+                                          onsubmit="return confirm('Remove this chapter?')"
+                                          onclick="event.stopPropagation()">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete-chapter-' ~ chapter.id) }}">
+                                        <button type="submit" class="p-2 rounded-lg text-stone-700 hover:text-red-400 hover:bg-red-400/5 transition-all">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                    <svg class="w-4 h-4 text-stone-600 transition-transform duration-200 chevron" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            {# Expanded content #}
+                            <div class="chapter-detail hidden px-5 pb-5 border-t border-white/5">
+                                {% set prompt_labels = {
+                                    mattered: 'What mattered to you then',
+                                    afraid: 'What you were afraid of',
+                                    needed: 'What you needed',
+                                    self_view: 'How you saw yourself',
+                                    running: 'What you were running toward or away from',
+                                } %}
+                                {% if chapter.promptResponses %}
+                                    <div class="grid sm:grid-cols-2 gap-4 mt-4">
+                                        {% for key, label in prompt_labels %}
+                                            {% if chapter.promptResponses[key] is defined and chapter.promptResponses[key] %}
+                                                <div class="rounded-lg p-4" style="background: rgba(255,255,255,0.03);">
+                                                    <p class="text-xs text-stone-600 uppercase tracking-wider mb-2">{{ label }}</p>
+                                                    <p class="text-stone-300 text-sm leading-relaxed">{{ chapter.promptResponses[key] }}</p>
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <p class="text-stone-600 text-sm mt-4 italic">No responses recorded for this chapter.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block head %}
+<style>
+.chapter-card-inner { box-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+.chapter-card-inner:hover { transform: translateY(-1px); box-shadow: 0 4px 30px rgba(0,0,0,0.5); }
+</style>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+function renderMarkdown() {
+    if (typeof marked === 'undefined') return;
+    document.querySelectorAll('.markdown-rendered[data-raw]').forEach(function(el) {
+        el.innerHTML = marked.parse(el.dataset.raw, { breaks: true });
+    });
+}
+renderMarkdown();
+
+function setThroughlineMinimized(minimized) {
+    var body = document.getElementById('saved-throughline-body');
+    var regen = document.getElementById('throughline-regen');
+    var btn = document.getElementById('throughline-toggle');
+    if (!body) return;
+    var wrapper = document.getElementById('saved-throughline-wrapper');
+    var block = document.getElementById('throughline-block');
+    if (minimized) {
+        body.classList.add('hidden');
+        if (regen) regen.classList.add('hidden');
+        if (wrapper) { wrapper.classList.remove('mb-5'); wrapper.classList.add('mb-0'); }
+        if (block) { block.classList.remove('p-6'); block.classList.add('pt-6', 'px-6', 'pb-3'); }
+        btn.textContent = 'Show';
+    } else {
+        body.classList.remove('hidden');
+        if (regen) regen.classList.remove('hidden');
+        if (wrapper) { wrapper.classList.remove('mb-0'); wrapper.classList.add('mb-5'); }
+        if (block) { block.classList.remove('pt-6', 'px-6', 'pb-3'); block.classList.add('p-6'); }
+        btn.textContent = 'Minimize';
+    }
+    localStorage.setItem('throughline-minimized', minimized ? '1' : '0');
+}
+
+function toggleSavedThroughline() {
+    var body = document.getElementById('saved-throughline-body');
+    if (!body) return;
+    setThroughlineMinimized(!body.classList.contains('hidden'));
+}
+
+// Restore state on load
+(function() {
+    if (localStorage.getItem('throughline-minimized') === '1') {
+        setThroughlineMinimized(true);
+    }
+})();
+
+function toggleChapter(id) {
+    const card = document.querySelector(`[data-id="${id}"]`);
+    const detail = card.querySelector('.chapter-detail');
+    const chevron = card.querySelector('.chevron');
+    detail.classList.toggle('hidden');
+    chevron.style.transform = detail.classList.contains('hidden') ? '' : 'rotate(180deg)';
+}
+
+async function startThroughlineDiscovery() {
+    const btn = document.getElementById('discover-btn');
+    const output = document.getElementById('throughline-output');
+    const text = document.getElementById('throughline-text');
+    const cursor = document.getElementById('throughline-cursor');
+
+    btn.disabled = true;
+    btn.textContent = 'Finding your throughline...';
+    output.classList.remove('hidden');
+    text.textContent = '';
+    cursor.classList.remove('hidden');
+
+    let fullText = '';
+
+    try {
+        const response = await fetch('{{ path("ai_throughline") }}', {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            fullText += chunk;
+            text.textContent = fullText;
+            text.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+
+        cursor.classList.add('hidden');
+
+        // Render markdown
+        if (typeof marked !== 'undefined' && fullText.trim()) {
+            text.innerHTML = marked.parse(fullText, { breaks: true });
+        }
+
+        // Save insight silently
+        if (fullText.trim()) {
+            await fetch('{{ path("ai_save_insight") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'throughline', content: fullText }),
+            });
+        }
+    } catch (e) {
+        text.textContent = 'Something went wrong. Please try again.';
+        cursor.classList.add('hidden');
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = `<svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Regenerate`;
+}
+</script>
+{% endblock %}

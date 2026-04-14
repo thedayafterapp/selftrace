@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}One thing to know — Selftrace{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex items-center justify-center px-4 py-12" style="background: #0d0f1a;">
+    <div class="w-full max-w-2xl">
+        {# Progress #}
+        <div class="flex items-center justify-center gap-2 mb-12">
+            <div class="w-8 h-1.5 rounded-full" style="background: rgba(245,158,11,0.4);"></div>
+            <div class="w-8 h-1.5 rounded-full" style="background: rgba(245,158,11,0.4);"></div>
+            <div class="w-8 h-1.5 rounded-full bg-amber-500"></div>
+        </div>
+
+        <div class="text-center mb-10">
+            <p class="text-amber-400/70 text-sm tracking-widest uppercase mb-4">Step 3 of 3</p>
+            <h1 class="font-serif text-4xl md:text-5xl mb-4" style="color: #f0ede8;">
+                One thing to know.
+            </h1>
+        </div>
+
+        <div class="rounded-2xl p-8 md:p-10 mb-10" style="background: #131628; border: 1px solid rgba(255,255,255,0.06);">
+            <div class="space-y-6 text-stone-300 text-lg leading-relaxed">
+                <p>
+                    Selftrace works over time.
+                </p>
+                <p>
+                    The more you add — chapters, parts, reflections — the more the patterns emerge. One chapter tells you something. Five chapters start to show you who you've always been.
+                </p>
+                <p>
+                    Think of this as a long conversation with yourself. You're not trying to solve yourself in one sitting. You're building a picture, slowly and honestly, of the person who's been there all along.
+                </p>
+
+                <blockquote class="border-l-4 pl-6 py-2" style="border-color: #d4af37;">
+                    <p class="font-serif text-xl leading-relaxed" style="color: #d4af37; font-style: italic;">
+                        "You are not a collection of moods. You are not the worst version of yourself. You are the thread running through all of it."
+                    </p>
+                </blockquote>
+
+                <p>
+                    When you're ready, the AI will read everything you've written and reflect back what it sees — not a diagnosis, not a report, but a warm and specific mirror.
+                </p>
+                <p class="text-stone-400">
+                    Start whenever you're ready. There's no wrong way to begin.
+                </p>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <form method="post" action="{{ path('onboarding_complete') }}">
+                <button type="submit"
+                        class="inline-flex items-center gap-3 px-10 py-5 rounded-full font-medium text-lg group btn-amber btn-amber-glow">
+                    Let's begin
+                    <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

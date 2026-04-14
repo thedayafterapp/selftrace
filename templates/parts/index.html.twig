@@ -1,0 +1,214 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}My Parts — Selftrace{% endblock %}
+
+{% block content %}
+<div class="space-y-8">
+    {# Header #}
+    <div class="flex items-end justify-between">
+        <div>
+            <h1 class="font-serif text-3xl mb-1" style="color: #f0ede8;">My Parts</h1>
+            <p class="text-stone-500">The recurring aspects of yourself — all real, none the whole story</p>
+        </div>
+        <a href="{{ path('parts_new') }}"
+           class="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium btn-ghost-rose">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+            </svg>
+            Add a part
+        </a>
+    </div>
+
+    {% if parts is empty %}
+        <div class="flex flex-col items-center justify-center py-24 text-center">
+            <div class="w-16 h-16 mb-6 opacity-30" style="color: #e8a5a0;">
+                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="32" cy="20" r="8" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="16" cy="44" r="7" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="48" cy="44" r="7" stroke="currentColor" stroke-width="2"/>
+                    <line x1="32" y1="28" x2="16" y2="37" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="32" y1="28" x2="48" y2="37" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h2 class="font-serif text-2xl text-stone-400 mb-3">You haven't named any parts yet</h2>
+            <p class="text-stone-600 max-w-sm leading-relaxed mb-8">
+                Think about the recurring modes or aspects of yourself that show up across your life. The one who disappears. The one who fights. The one who needs to be needed.
+            </p>
+            <a href="{{ path('parts_new') }}"
+               class="inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium text-sm btn-rose">
+                Meet your first part
+            </a>
+        </div>
+
+    {% else %}
+
+        {# AI synthesis — progress or CTA #}
+        {% if parts|length < 3 %}
+            <div class="rounded-xl px-5 py-4" style="background: rgba(232,165,160,0.05); border: 1px solid rgba(232,165,160,0.12);">
+                <p class="text-sm">
+                    <span style="color: rgba(232,165,160,0.8);">Parts synthesis unlocks with 3 parts.</span>
+                    <span class="text-stone-500 ml-1">{{ 3 - parts|length }} more to go.</span>
+                </p>
+                <div class="mt-2.5 h-1.5 rounded-full overflow-hidden max-w-xs" style="background: rgba(255,255,255,0.06);">
+                    <div class="h-full rounded-full" style="width: {{ (parts|length / 3 * 100)|round }}%; background: rgba(232,165,160,0.4);"></div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if parts|length >= 3 %}
+            <div class="rounded-2xl p-6" style="background: linear-gradient(135deg, rgba(232,165,160,0.08), rgba(232,165,160,0.04)); border: 1px solid rgba(232,165,160,0.2);">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="inline-block w-2 h-2 rounded-full animate-pulse" style="background: #e8a5a0;"></span>
+                    <span class="text-xs uppercase tracking-wider" style="color: rgba(232,165,160,0.7);">Parts Synthesis</span>
+                </div>
+
+                {# Saved synthesis — always visible #}
+                {% if latest_synthesis %}
+                    <p class="font-serif text-base mb-4" style="color: rgba(232,165,160,0.7);">
+                        What your parts share
+                        <span class="text-stone-600 font-sans text-xs font-normal ml-2">{{ latest_synthesis.generatedAt|date("M j, Y") }}</span>
+                    </p>
+                    <div id="saved-synthesis-text" class="font-serif text-lg text-stone-200 leading-relaxed markdown-rendered mb-5" data-raw="{{ latest_synthesis.content|e('html_attr') }}"></div>
+                    <p class="text-stone-500 text-sm mb-4">Regenerate anytime — each new part makes the analysis richer.</p>
+                    <button onclick="startPartsSynthesis()"
+                            id="parts-btn"
+                            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-medium text-sm btn-ghost-rose">
+                        Regenerate
+                    </button>
+                {% else %}
+                    <h2 class="font-serif text-2xl mb-2" style="color: #f0c8c4;">What are my parts trying to tell me?</h2>
+                    <p class="text-stone-400 text-sm mb-5 max-w-lg">
+                        You've named {{ parts|length }} parts. Let the AI read across all of them and find what they have in common underneath — the core needs and fears that drive them all.
+                    </p>
+                    <button onclick="startPartsSynthesis()"
+                            id="parts-btn"
+                            class="inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium text-sm btn-rose">
+                        Find what my parts share
+                    </button>
+                {% endif %}
+
+                <div id="parts-output" class="hidden mt-6">
+                    <div class="border-t pt-6" style="border-color: rgba(232,165,160,0.2);">
+                        <div id="parts-text" class="font-serif text-lg text-stone-200 leading-relaxed whitespace-pre-wrap"></div>
+                        <div id="parts-cursor" class="inline-block w-0.5 h-5 animate-pulse ml-0.5 hidden" style="background: #e8a5a0;"></div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {# Parts gallery #}
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {% for part in parts %}
+                <div class="part-card rounded-2xl p-6 relative group transition-all duration-300 hover:shadow-2xl"
+                     style="background: #131628; border: 1px solid rgba(255,255,255,0.06); border-top: 3px solid {{ part.colorHex }};">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg font-serif font-semibold"
+                             style="background: {{ part.colorHex }}20; color: {{ part.colorHex }};">
+                            {{ part.name|slice(0,1)|upper }}
+                        </div>
+                        <div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <a href="{{ path('parts_edit', {id: part.id}) }}"
+                               class="p-1.5 rounded-lg text-stone-600 hover:text-stone-300 hover:bg-white/5 transition-all">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/>
+                                </svg>
+                            </a>
+                            <form method="post" action="{{ path('parts_delete', {id: part.id}) }}"
+                                  onsubmit="return confirm('Remove this part?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete-part-' ~ part.id) }}">
+                                <button type="submit" class="p-1.5 rounded-lg text-stone-700 hover:text-red-400 hover:bg-red-400/5 transition-all">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <h3 class="font-serif text-xl mb-3" style="color: {{ part.colorHex }};">{{ part.name }}</h3>
+
+                    {% if part.triggerText %}
+                        <div class="mb-3">
+                            <p class="text-xs text-stone-600 uppercase tracking-wider mb-1">Brought out by</p>
+                            <p class="text-stone-400 text-sm leading-relaxed line-clamp-2">{{ part.triggerText }}</p>
+                        </div>
+                    {% endif %}
+
+                    {% if part.fearsText %}
+                        <div>
+                            <p class="text-xs text-stone-600 uppercase tracking-wider mb-1">Afraid of</p>
+                            <p class="text-stone-400 text-sm leading-relaxed line-clamp-2">{{ part.fearsText }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+function renderMarkdown() {
+    if (typeof marked === 'undefined') return;
+    document.querySelectorAll('.markdown-rendered[data-raw]').forEach(function(el) {
+        el.innerHTML = marked.parse(el.dataset.raw, { breaks: true });
+    });
+}
+renderMarkdown();
+
+async function startPartsSynthesis() {
+    const btn = document.getElementById('parts-btn');
+    const output = document.getElementById('parts-output');
+    const text = document.getElementById('parts-text');
+    const cursor = document.getElementById('parts-cursor');
+
+    btn.disabled = true;
+    btn.textContent = 'Reading your parts...';
+    output.classList.remove('hidden');
+    text.textContent = '';
+    cursor.classList.remove('hidden');
+
+    let fullText = '';
+
+    try {
+        const response = await fetch('{{ path("ai_parts_synthesis") }}', {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            const chunk = decoder.decode(value, { stream: true });
+            fullText += chunk;
+            text.textContent = fullText;
+        }
+
+        cursor.classList.add('hidden');
+
+        if (typeof marked !== 'undefined' && fullText.trim()) {
+            text.innerHTML = marked.parse(fullText, { breaks: true });
+        }
+
+        if (fullText.trim()) {
+            await fetch('{{ path("ai_save_insight") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: 'parts_synthesis', content: fullText }),
+            });
+        }
+    } catch (e) {
+        text.textContent = 'Something went wrong. Please try again.';
+        cursor.classList.add('hidden');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Regenerate';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,291 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Selftrace — Find the continuous you{% endblock %}
+
+{% block head %}
+<meta name="description" content="Selftrace helps people with BPD and identity diffusion find the continuous thread running through every version of themselves. Free, open source, self-hosted.">
+<meta name="keywords" content="BPD, borderline personality disorder, identity diffusion, narrative therapy, IFS, self-reflection, mental health tool, open source">
+<meta property="og:title" content="Selftrace — Find the continuous you">
+<meta property="og:description" content="A self-reflection tool for people with BPD and identity diffusion. Map your chapters, meet your parts, find the thread that's always been you.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Selftrace — Find the continuous you">
+<meta name="twitter:description" content="A self-reflection tool for people with BPD and identity diffusion. Map your chapters, meet your parts, find the thread that's always been you.">
+<style>
+/* Animated orb background */
+.orb-bg {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    z-index: 0;
+    pointer-events: none;
+}
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.18;
+    animation: drift linear infinite;
+}
+.orb-1 {
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, #f59e0b, transparent 70%);
+    top: -200px; left: -100px;
+    animation-duration: 28s;
+    animation-delay: 0s;
+}
+.orb-2 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, #e8a5a0, transparent 70%);
+    top: 20%; right: -150px;
+    animation-duration: 35s;
+    animation-delay: -10s;
+}
+.orb-3 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, #d4af37, transparent 70%);
+    bottom: -100px; left: 30%;
+    animation-duration: 40s;
+    animation-delay: -20s;
+}
+.orb-4 {
+    width: 350px; height: 350px;
+    background: radial-gradient(circle, #8b5cf6, transparent 70%);
+    top: 60%; left: 10%;
+    animation-duration: 32s;
+    animation-delay: -5s;
+}
+@keyframes drift {
+    0%   { transform: translate(0, 0) scale(1); }
+    25%  { transform: translate(40px, -30px) scale(1.05); }
+    50%  { transform: translate(-20px, 50px) scale(0.95); }
+    75%  { transform: translate(-50px, -20px) scale(1.02); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="orb-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+</div>
+
+<div class="relative z-10">
+    {# Top navigation #}
+    <header class="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto">
+        <div class="flex items-center gap-3">
+            <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8">
+                <path d="M4 16 Q8 8 16 16 Q24 24 28 16" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                <circle cx="4" cy="16" r="2" fill="#f59e0b"/>
+                <circle cx="28" cy="16" r="2" fill="#f59e0b"/>
+            </svg>
+            <span class="font-serif text-2xl font-semibold text-amber-400">Selftrace</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="{{ path('security_login') }}" class="text-sm text-stone-400 hover:text-stone-200 transition-colors">Sign in</a>
+            <a href="{{ path('security_register') }}"
+               class="text-sm px-4 py-2 rounded-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 hover:text-amber-200 border border-amber-500/30 transition-all duration-200">
+                Get started
+            </a>
+        </div>
+    </header>
+
+    {# Hero section #}
+    <section class="min-h-[90vh] flex items-center px-8 py-20 max-w-4xl mx-auto">
+        <div>
+            <p class="text-amber-400/80 text-sm font-medium tracking-widest uppercase mb-8">For people who feel like strangers to themselves</p>
+
+            <h1 class="font-serif text-5xl md:text-6xl lg:text-7xl leading-tight mb-8" style="color: #f0ede8;">
+                Do you feel like a<br>
+                <em class="text-amber-400 not-italic">different person</em><br>
+                depending on the month,<br>
+                the relationship,<br>
+                the room you're in?
+            </h1>
+
+            <p class="text-xl text-stone-400 mb-4 leading-relaxed max-w-2xl">
+                Like there's no stable "you" underneath it all?
+            </p>
+
+            <div class="inline-block px-5 py-3 rounded-xl mb-8 mt-2" style="background: rgba(232,165,160,0.08); border: 1px solid rgba(232,165,160,0.2);">
+                <p class="text-rose-300/90 text-base leading-relaxed">
+                    That's called <strong class="text-rose-300">identity diffusion</strong>. It's one of the core experiences of BPD.<br>
+                    And it's <em>exhausting</em>.
+                </p>
+            </div>
+
+            <div class="max-w-2xl mb-12">
+                <p class="text-lg text-stone-300 leading-relaxed mb-6">
+                    But here's what we believe: <strong class="text-amber-300">there is a you</strong>. A continuous thread running through every version you've ever been. You just haven't been able to see it yet.
+                </p>
+                <p class="text-lg text-stone-400 leading-relaxed">
+                    Selftrace helps you find it.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3 mb-6">
+                <a href="{{ path('security_register') }}"
+                   class="inline-flex items-center gap-3 px-8 py-4 rounded-full text-base font-medium group btn-amber btn-amber-glow">
+                    Start finding your throughline — it's free
+                    <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
+                </a>
+                <a href="#open-source"
+                   class="inline-flex items-center gap-2 px-5 py-4 rounded-full text-sm font-medium transition-all duration-200"
+                   style="background: rgba(139,92,246,0.12); color: #a78bfa; border: 1px solid rgba(139,92,246,0.25);">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                    </svg>
+                    Open source & self-hosted
+                </a>
+            </div>
+
+            <p class="text-stone-600 text-sm">No credit card. No intake forms. Just you and your story.</p>
+        </div>
+    </section>
+
+    {# Approach section #}
+    <section class="px-8 py-20 max-w-4xl mx-auto border-t border-white/5">
+        <h2 class="font-serif text-3xl md:text-4xl mb-6" style="color: #f0ede8;">
+            Using principles from narrative therapy, IFS, and mentalization,<br>
+            <span class="text-amber-400">Selftrace helps you map who you've been, find the patterns underneath, and build a story of yourself that actually holds.</span>
+        </h2>
+        <p class="text-stone-400 text-lg leading-relaxed max-w-2xl">
+            The more you add, the clearer the picture becomes. Think of it as a long conversation with yourself — one that finally goes somewhere.
+        </p>
+    </section>
+
+    {# Features section #}
+    <section class="px-8 py-20 max-w-5xl mx-auto">
+        <div class="grid md:grid-cols-2 gap-8">
+
+            {# Timeline feature #}
+            <div class="feature-card p-8 rounded-2xl" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
+                <div class="w-12 h-12 mb-6 text-amber-400">
+                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="12" y1="8" x2="12" y2="40" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="12" cy="14" r="4" fill="currentColor"/>
+                        <circle cx="12" cy="24" r="4" fill="currentColor"/>
+                        <circle cx="12" cy="34" r="4" fill="currentColor"/>
+                        <line x1="12" y1="14" x2="38" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="12" y1="24" x2="34" y2="24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="12" y1="34" x2="36" y2="34" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h3 class="font-serif text-2xl mb-3 text-stone-100">Your Timeline</h3>
+                <p class="text-stone-400 leading-relaxed">
+                    Map the chapters of your life — the periods where you felt like a different version of yourself. Give them names. Choose colors. See your whole story laid out.
+                </p>
+            </div>
+
+            {# Parts feature #}
+            <div class="feature-card p-8 rounded-2xl" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
+                <div class="w-12 h-12 mb-6" style="color: #e8a5a0;">
+                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="24" cy="16" r="6" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="12" cy="34" r="5" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="36" cy="34" r="5" stroke="currentColor" stroke-width="2"/>
+                        <line x1="24" y1="22" x2="12" y2="29" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <line x1="24" y1="22" x2="36" y2="29" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h3 class="font-serif text-2xl mb-3 text-stone-100">Your Parts</h3>
+                <p class="text-stone-400 leading-relaxed">
+                    Most of us contain multitudes. Meet the recurring aspects of yourself — the parts that show up across your life. None of them is the whole you. All of them matter.
+                </p>
+            </div>
+
+            {# Reflections feature #}
+            <div class="feature-card p-8 rounded-2xl" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
+                <div class="w-12 h-12 mb-6" style="color: #d4af37;">
+                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="8" y="8" width="32" height="32" rx="4" stroke="currentColor" stroke-width="2"/>
+                        <line x1="16" y1="18" x2="32" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="16" y1="24" x2="28" y2="24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="16" y1="30" x2="24" y2="30" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h3 class="font-serif text-2xl mb-3 text-stone-100">Daily Reflections</h3>
+                <p class="text-stone-400 leading-relaxed">
+                    One thoughtful prompt per day, chosen for you. Not journaling for its own sake — each question is designed to surface something real and continuous about who you are.
+                </p>
+            </div>
+
+            {# Patterns feature #}
+            <div class="feature-card p-8 rounded-2xl" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);">
+                <div class="w-12 h-12 mb-6" style="color: #a78bfa;">
+                    <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <polyline points="8,36 18,20 26,28 34,12 40,18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                        <circle cx="8" cy="36" r="2.5" fill="currentColor"/>
+                        <circle cx="18" cy="20" r="2.5" fill="currentColor"/>
+                        <circle cx="26" cy="28" r="2.5" fill="currentColor"/>
+                        <circle cx="34" cy="12" r="2.5" fill="currentColor"/>
+                        <circle cx="40" cy="18" r="2.5" fill="currentColor"/>
+                    </svg>
+                </div>
+                <h3 class="font-serif text-2xl mb-3 text-stone-100">Patterns</h3>
+                <p class="text-stone-400 leading-relaxed">
+                    See the themes that repeat across everything you've written. What do you keep coming back to? What's always been there? The data reveals what the heart already knows.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    {# Open source section #}
+    <section id="open-source" class="px-8 py-20 max-w-4xl mx-auto border-t border-white/5">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+            <div class="flex-1">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="text-xs px-2 py-0.5 rounded-full font-medium" style="background: rgba(139,92,246,0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.25);">Open source</span>
+                    <span class="text-xs px-2 py-0.5 rounded-full font-medium" style="background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2);">Self-hosted</span>
+                </div>
+                <h2 class="font-serif text-3xl mb-4" style="color: #f0ede8;">Your data stays yours.</h2>
+                <p class="text-stone-400 leading-relaxed max-w-lg">
+                    Selftrace is free and open source. Run it on your own machine — no subscription, no data leaving your computer.
+                </p>
+            </div>
+            <div class="flex flex-col gap-3 flex-shrink-0">
+                <a href="https://github.com/thedayafterapp/selftrace.git" target="_blank" rel="noopener"
+                   class="inline-flex items-center gap-2.5 px-6 py-3 rounded-full text-sm font-medium transition-all duration-200"
+                   style="background: rgba(255,255,255,0.05); color: #e2e0ec; border: 1px solid rgba(255,255,255,0.1);">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                    </svg>
+                    View on GitHub
+                </a>
+                <p class="text-stone-600 text-xs text-center">docker compose up and you're running</p>
+            </div>
+        </div>
+    </section>
+
+    {# Final CTA #}
+    <section class="px-8 py-24 max-w-4xl mx-auto text-center border-t border-white/5">
+        <h2 class="font-serif text-4xl md:text-5xl mb-6" style="color: #f0ede8;">
+            The thread has always been there.<br>
+            <div class="text-amber-400 pt-2">You just need help seeing it.</div>
+        </h2>
+        <a href="{{ path('security_register') }}"
+           class="inline-flex items-center gap-3 px-10 py-5 rounded-full text-lg font-medium group btn-amber btn-amber-glow">
+            Begin your throughline
+            <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+        </a>
+    </section>
+
+    {# Footer #}
+    <footer class="border-t border-white/5 px-8 py-8 text-center space-y-2">
+        <p class="text-stone-600 text-sm">
+            Selftrace is not therapy. It is a tool for self-reflection. If you are in crisis, please reach out to a mental health professional.
+        </p>
+        <p class="text-stone-700 text-xs">
+            Open source —
+            <a href="https://github.com/thedayafterapp/selftrace.git" target="_blank" rel="noopener" class="hover:text-stone-500 transition-colors underline underline-offset-2">github.com/thedayafterapp/selftrace</a>
+        </p>
+    </footer>
+</div>
+{% endblock %}

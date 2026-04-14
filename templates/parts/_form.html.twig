@@ -1,0 +1,106 @@
+{% set current_color = form.vars.data.colorHex ?? '#e8a5a0' %}
+
+<div class="rounded-2xl p-6 md:p-8" style="background: #131628; border: 1px solid rgba(255,255,255,0.06);">
+    {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+
+    <div class="space-y-7">
+
+        {# Name #}
+        <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-2">{{ form_label(form.name) }}</label>
+            {{ form_widget(form.name, {
+                attr: {
+                    class: 'form-input w-full px-4 py-3 rounded-xl text-stone-100 text-sm',
+                    style: 'background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);'
+                }
+            }) }}
+            {{ form_errors(form.name) }}
+        </div>
+
+        {# Textarea fields #}
+        {% set fields = ['triggerText', 'needsText', 'fearsText', 'protectsText'] %}
+        {% for field in fields %}
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-2">{{ form_label(form[field]) }}</label>
+                {{ form_widget(form[field], {
+                    attr: {
+                        class: 'form-input w-full px-4 py-3 rounded-xl text-stone-100 text-sm resize-none',
+                        style: 'background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);'
+                    }
+                }) }}
+            </div>
+        {% endfor %}
+
+        {# Color picker #}
+        <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-3">Part color</label>
+
+            {# Hidden input — Symfony generates the ID #}
+            {{ form_widget(form.colorHex, { attr: { class: 'sr-only' } }) }}
+
+            {% set swatches = [
+                '#f59e0b', '#f97316', '#ef4444', '#f43f5e',
+                '#ec4899', '#a855f7', '#6366f1', '#3b82f6',
+                '#06b6d4', '#10b981', '#84cc16', '#78716c'
+            ] %}
+            <div class="flex flex-wrap gap-2.5">
+                {% for color in swatches %}
+                    <button type="button"
+                            onclick="selectColor('{{ color }}')"
+                            title="{{ color }}"
+                            data-swatch="{{ color }}"
+                            class="color-swatch w-8 h-8 rounded-full transition-all duration-150 focus:outline-none"
+                            style="background: {{ color }}; {{ current_color == color ? 'box-shadow: 0 0 0 2px #131628, 0 0 0 4px ' ~ color ~ ';' : '' }}">
+                    </button>
+                {% endfor %}
+
+                <label title="Custom color"
+                       class="w-8 h-8 rounded-full cursor-pointer flex items-center justify-center hover:ring-2 hover:ring-white/30 transition-all"
+                       style="background: conic-gradient(#ef4444, #f97316, #eab308, #22c55e, #3b82f6, #8b5cf6, #ef4444);">
+                    <input type="color" id="custom-color-picker" value="{{ current_color }}"
+                           oninput="selectColor(this.value)"
+                           class="sr-only">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 drop-shadow" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                    </svg>
+                </label>
+            </div>
+
+            <div class="mt-3 flex items-center gap-2.5">
+                <div id="color-preview" class="w-5 h-5 rounded-full flex-shrink-0 ring-1 ring-white/20" style="background: {{ current_color }};"></div>
+                <span id="color-preview-label" class="text-xs text-stone-500 font-mono">{{ current_color }}</span>
+            </div>
+        </div>
+
+        {# Submit #}
+        <div class="flex items-center gap-4 pt-6 border-t border-white/5">
+            <button type="submit"
+                    class="px-6 py-3 rounded-full font-medium text-sm btn-rose">
+                Save part
+            </button>
+            <a href="{{ path('parts_index') }}" class="text-sm text-stone-500 hover:text-stone-300 transition-colors">Cancel</a>
+        </div>
+
+    </div>
+
+    {{ form_end(form) }}
+</div>
+
+<script>
+const colorInput = document.getElementById('{{ form.colorHex.vars.id }}');
+const colorPreview = document.getElementById('color-preview');
+const colorPreviewLabel = document.getElementById('color-preview-label');
+
+function selectColor(hex) {
+    colorInput.value = hex;
+    document.getElementById('custom-color-picker').value = hex;
+    colorPreview.style.background = hex;
+    colorPreviewLabel.textContent = hex;
+
+    document.querySelectorAll('.color-swatch').forEach(function(el) {
+        el.style.boxShadow = el.dataset.swatch === hex
+            ? '0 0 0 2px #131628, 0 0 0 4px ' + hex
+            : '';
+    });
+}
+</script>

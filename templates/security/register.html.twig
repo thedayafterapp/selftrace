@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Create an account — Selftrace{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex items-center justify-center px-4 py-12" style="background: #0d0f1a;">
+    <div class="w-full max-w-md">
+        {# Logo #}
+        <div class="text-center mb-10">
+            <a href="{{ path('app_landing') }}" class="inline-flex items-center gap-3 group">
+                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-8 h-8">
+                    <path d="M4 16 Q8 8 16 16 Q24 24 28 16" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                    <circle cx="4" cy="16" r="2" fill="#f59e0b"/>
+                    <circle cx="28" cy="16" r="2" fill="#f59e0b"/>
+                </svg>
+                <span class="font-serif text-2xl font-semibold text-amber-400">Selftrace</span>
+            </a>
+            <p class="text-stone-500 text-sm mt-3">Start finding your continuous self</p>
+        </div>
+
+        {# Form card #}
+        <div class="rounded-2xl p-8" style="background: #131628; border: 1px solid rgba(255,255,255,0.06);">
+            {{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+
+            <div class="mb-5">
+                <label class="block text-sm font-medium text-stone-400 mb-2">Username</label>
+                {{ form_widget(form.username, {
+                    attr: {
+                        class: 'form-input w-full px-4 py-3 rounded-xl text-stone-100 text-sm placeholder-stone-600',
+                        style: 'background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);',
+                        placeholder: 'your_username',
+                        autocomplete: 'username'
+                    }
+                }) }}
+                {{ form_errors(form.username) }}
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-stone-400 mb-2">Password</label>
+                {{ form_widget(form.plainPassword, {
+                    attr: {
+                        class: 'form-input w-full px-4 py-3 rounded-xl text-stone-100 text-sm placeholder-stone-600',
+                        style: 'background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);',
+                        placeholder: 'At least 6 characters',
+                        autocomplete: 'new-password'
+                    }
+                }) }}
+                {{ form_errors(form.plainPassword) }}
+            </div>
+
+            <button type="submit"
+                    class="w-full py-3 px-6 rounded-xl font-medium text-sm btn-amber">
+                Create account
+            </button>
+
+            {{ form_end(form) }}
+        </div>
+
+        <p class="text-center text-stone-500 text-sm mt-6">
+            Already have an account?
+            <a href="{{ path('security_login') }}" class="text-amber-400 hover:text-amber-300 transition-colors">Sign in</a>
+        </p>
+
+        <p class="text-center text-stone-600 text-xs mt-4 px-4 leading-relaxed">
+            Selftrace is not a crisis service. If you are in immediate distress, please contact a mental health professional or crisis line.
+        </p>
+    </div>
+</div>
+{% endblock %}

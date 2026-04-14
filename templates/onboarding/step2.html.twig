@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}How it works — Selftrace{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex items-center justify-center px-4 py-12" style="background: #0d0f1a;">
+    <div class="w-full max-w-2xl">
+        {# Progress #}
+        <div class="flex items-center justify-center gap-2 mb-12">
+            <div class="w-8 h-1.5 rounded-full" style="background: rgba(245,158,11,0.4);"></div>
+            <div class="w-8 h-1.5 rounded-full bg-amber-500"></div>
+            <div class="w-8 h-1.5 rounded-full" style="background: rgba(255,255,255,0.15);"></div>
+        </div>
+
+        <div class="text-center mb-10">
+            <p class="text-amber-400/70 text-sm tracking-widest uppercase mb-4">Step 2 of 3</p>
+            <h1 class="font-serif text-4xl md:text-5xl mb-4" style="color: #f0ede8;">
+                How Selftrace works.
+            </h1>
+            <p class="text-stone-400 text-lg">Three things. That's it.</p>
+        </div>
+
+        <div class="space-y-5 mb-10">
+            {# Step 1 #}
+            <div class="flex gap-6 p-6 rounded-2xl items-start" style="background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.15);">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-serif text-lg font-semibold" style="background: rgba(245,158,11,0.2); color: #f59e0b;">1</div>
+                <div>
+                    <h3 class="font-serif text-xl text-amber-300 mb-2">Map your chapters</h3>
+                    <p class="text-stone-400 leading-relaxed">
+                        Add the different periods of your life — the times you felt like a distinctly different version of yourself. Give them a name, a color, a date range. You don't need to have it all figured out. Just start.
+                    </p>
+                </div>
+            </div>
+
+            {# Step 2 #}
+            <div class="flex gap-6 p-6 rounded-2xl items-start" style="background: rgba(232,165,160,0.06); border: 1px solid rgba(232,165,160,0.15);">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-serif text-lg font-semibold" style="background: rgba(232,165,160,0.2); color: #e8a5a0;">2</div>
+                <div>
+                    <h3 class="font-serif text-xl mb-2" style="color: #e8a5a0;">Meet your parts</h3>
+                    <p class="text-stone-400 leading-relaxed">
+                        Name the recurring aspects of yourself that show up across your life — the part that disappears, the part that fights, the part that needs to be needed. None of them is the whole you. But they're all real, and they all make sense.
+                    </p>
+                </div>
+            </div>
+
+            {# Step 3 #}
+            <div class="flex gap-6 p-6 rounded-2xl items-start" style="background: rgba(212,175,55,0.06); border: 1px solid rgba(212,175,55,0.15);">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-serif text-lg font-semibold" style="background: rgba(212,175,55,0.2); color: #d4af37;">3</div>
+                <div>
+                    <h3 class="font-serif text-xl mb-2" style="color: #d4af37;">Reflect daily</h3>
+                    <p class="text-stone-400 leading-relaxed">
+                        One thoughtful question, every day. Not a mood tracker. Not a gratitude log. Each question is specifically designed to surface the continuous thread — the values, patterns, and qualities that were always you.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <a href="{{ path('onboarding_step3') }}"
+               class="inline-flex items-center gap-3 px-8 py-4 rounded-full font-medium group btn-amber">
+                I'm ready
+                <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
