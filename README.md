@@ -31,7 +31,7 @@ cp .env.example .env
 docker compose up --build
 ```
 
-Visit **http://localhost:8080** — the first build takes a few minutes.
+Visit **http://localhost:6622** — the first build takes a few minutes.
 
 See [SETUP.md](SETUP.md) for full setup instructions, useful commands, and troubleshooting.
 

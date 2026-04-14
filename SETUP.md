@@ -41,7 +41,7 @@ The first build takes a few minutes. It will:
 
 **4. Open the app**
 
-Visit **http://localhost:8080** and create an account.
+Visit **http://localhost:6622** and create an account.
 
 ---
 
@@ -75,7 +75,7 @@ This file is **not** loaded automatically — production only runs `docker-compo
 
 | Service    | URL / port                        |
 |------------|-----------------------------------|
-| App        | http://localhost:8080             |
+| App        | http://localhost:6622             |
 | MySQL      | localhost:3306 (user: selftrace, pass: selftrace) |
 | phpMyAdmin | http://localhost:8081 (dev only — see above) |
 
