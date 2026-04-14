@@ -8,6 +8,10 @@ services:
     volumes:
       - var_data:/var/www/html/var
       - public_data:/var/www/html/public
+      - ./src:/var/www/html/src
+      - ./templates:/var/www/html/templates
+      - ./config:/var/www/html/config
+      - ./migrations:/var/www/html/migrations
     depends_on:
       db:
         condition: service_healthy
