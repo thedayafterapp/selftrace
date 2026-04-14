@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Repository\AiInsightRepository;
 use App\Repository\ChapterRepository;
+use App\Repository\PartRepository;
 use App\Repository\ReflectionRepository;
 use App\Service\PatternService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,6 +21,7 @@ class PatternsController extends AbstractController
         PatternService $patternService,
         ReflectionRepository $reflectionRepo,
         ChapterRepository $chapterRepo,
+        PartRepository $partRepo,
         AiInsightRepository $insightRepo,
     ): Response {
         /** @var User $user */
@@ -30,6 +32,14 @@ class PatternsController extends AbstractController
         $writingDates = $reflectionRepo->getWritingDatesForHeatmap($user, 12);
         // Story sentences need chronological (oldest first) order
         $chapters = array_reverse($chapterRepo->findByUserOrderedByDate($user));
+
+        // Merge chapter and part creation dates into the heatmap
+        foreach ($chapters as $chapter) {
+            $writingDates[$chapter->getCreatedAt()->format('Y-m-d')] = true;
+        }
+        foreach ($partRepo->findByUser($user) as $part) {
+            $writingDates[$part->getCreatedAt()->format('Y-m-d')] = true;
+        }
 
         // Build "your story so far" — one sentence per chapter
         $storySentences = [];
